@@ -8,12 +8,12 @@ import java.util.Set;
 public class _51_N_Queens {
 
 	public static void main(String[] args) {
-		System.out.println(new _51_N_Queens().solveNQueens(4));
+		System.out.println(new _51_N_Queens().solveNQueens1(4));
 	}
-	
-	
-	
-	
+
+
+
+
 	/*************************** Actual Brute Force Approach *************************/
 	/**
 	 * time  : N^N + N*N
@@ -24,6 +24,10 @@ public class _51_N_Queens {
 
 	List<List<String>> output;
 	String[][] board;
+	Set<Integer> rows;
+	Set<Integer> cols;
+	Set<Integer> diagonals;
+	Set<Integer> oppDiagonals;
 
 	public List<List<String>> solveNQueens(int n) {
 		output = new ArrayList<List<String>>(n);
@@ -58,10 +62,10 @@ public class _51_N_Queens {
 
 	private boolean isValidBoard(int n) {
 
-		Set<Integer> rows  = new HashSet<>();
-		Set<Integer> cols  = new HashSet<>();
-		Set<Integer> diagonals  = new HashSet<>();
-		Set<Integer> oppDiagonals  = new HashSet<>();
+		rows  = new HashSet<>();
+		cols  = new HashSet<>();
+		diagonals  = new HashSet<>();
+		oppDiagonals  = new HashSet<>();
 
 		for(int i=0; i<n; i++) {
 			for(int j=0; j<n; j++) {
@@ -90,12 +94,53 @@ public class _51_N_Queens {
 		}
 		return serialisedBoard;
 	}
-	
-	/******************* Optimized brute force approach by backtracking and pruning using Bounding Function(prune if two queens in same, row, column, or diagonal or opposite diagonal)*******/
-	/**
+
+
+
+	/********************* Optimized brute force approach by backtracking and pruning using Bounding Function
+	 *  i.e prune the recursion branch if two queens in same, row, column, or diagonal or opposite diagonal
 	 * 
 	 */
-	
-	
+
+	public List<List<String>> solveNQueens1(int n) {
+		output = new ArrayList<List<String>>(n);
+		rows  = new HashSet<>();
+		cols  = new HashSet<>();
+		diagonals  = new HashSet<>();
+		oppDiagonals  = new HashSet<>();
+		initialiseBoard(n);
+		placeQueens1(n,0);
+		return output;
+	}
+
+
+	private void placeQueens1(int n, int currQueenRow) {
+		if(currQueenRow == n) {
+			output.add(copyBoard(n));
+			return;
+		}
+		for(int col=0;col<n; col++) {
+			// prune branch here, don't go further down in the recursion tree if the bounding function is violated
+			if(!(rows.contains(currQueenRow) || cols.contains(col) || diagonals.contains(currQueenRow+col) || oppDiagonals.contains(currQueenRow-col))) {
+
+				rows.add(currQueenRow);
+				cols.add(col);
+				diagonals.add(currQueenRow+col);
+				oppDiagonals.add(currQueenRow-col);
+
+				board[currQueenRow][col] = "q";
+
+				placeQueens1(n, currQueenRow+1);
+
+				board[currQueenRow][col] = ".";
+
+				rows.remove(currQueenRow);
+				cols.remove(col);
+				diagonals.remove(currQueenRow+col);
+				oppDiagonals.remove(currQueenRow-col);
+			}
+		}
+	}
+
 
 }
